@@ -5,34 +5,9 @@
 ### ライブラリ
 下記ライブラリを設定してください。  
 nnh/spreadSheetCommon  
-https://github.com/nnh/spreadSheetCommon  
-### Google Sheets APIサービスを設定してください。  
-```
-参考：appsscript.json
-
-{
-  "timeZone": "America/New_York",
-  "dependencies": {
-    "enabledAdvancedServices": [
-      {
-        "userSymbol": "Sheets",
-        "version": "v4",
-        "serviceId": "sheets"
-      }
-    ],
-    "libraries": [
-      {
-        "userSymbol": "spreadSheetCommon",
-        "version": "0",
-        "libraryId": "ライブラリID",
-        "developmentMode": true
-      }
-    ]
-  },
-  "exceptionLogging": "STACKDRIVER",
-  "runtimeVersion": "V8"
-}
-```
+https://github.com/nnh/spreadSheetCommon 
+### サービス
+Google Sheets APIサービスを設定してください。  
 ### スクリプトプロパティ
 - basicHospitalInformationId  
 NHO施設基本情報のスプレッドシートのIDを設定してください。  
