@@ -12,6 +12,7 @@ function main(){
   summarizeEnquete_(PropertiesService.getScriptProperties().getProperty('inputFileId2'), PropertiesService.getScriptProperties().getProperty('inputFileId2'));
 }
 function summarizeEnquete_(inputSsId, outputSsId){
+  const outputHospInfoHospNameIdx = 1;
   const inputSs = SpreadsheetApp.openById(inputSsId);
   const outputSs = SpreadsheetApp.openById(outputSsId);
   const inputSheetName = 'フォームの回答 1';
@@ -23,9 +24,9 @@ function summarizeEnquete_(inputSsId, outputSsId){
             : ['ソート順', '病院名', 'カテゴリー', '病院長', 'センター長・部長']
   );
   const enqueteOutputList = new Map([
-    ['実績・貢献・環境', [1, 22, 3, 4, 5, 8, 9, 10, 11]],
-    ['広報', [1, 22, 3, 4, 5, 12, 13, 14, 15, 16]],
-    ['経費・自由記載', [1, 22, 3, 4, 5, 17, 18, 19, 20, 21]],
+    ['実績・貢献・環境', [1, 2, 3, 4, 5, 8, 9, 10, 11]],
+    ['広報', [1, 2, 3, 4, 5, 12, 13, 14, 15, 16]],
+    ['経費・自由記載', [1, 2, 3, 4, 5, 17, 18, 19, 20, 21]],
   ]);
   const colWidthsList = new Map([
     ['実績・貢献・環境', [21, 140, 74, 77, 85, 80, 80, 80, 80]],
@@ -35,11 +36,27 @@ function summarizeEnquete_(inputSsId, outputSsId){
   const dummyHospInfo = new Array(outputHospInfo[0].length).fill('');
   const sortOrderIdx = 0;
   const mergeValues = inputValues.map(value => {
-    const hospName = value[hospNameIdx] === '弘前病院' 
-                                              ? '弘前総合医療センター' 
-                                              : value[hospNameIdx] !== '' ? value[hospNameIdx] : '無記名';
+    const tempHospName = value[hospNameIdx].replace(/^NHO/i, "");
+    const hospName = tempHospName === '弘前病院' ? '弘前総合医療センター' 
+                                                : tempHospName !== '' 
+                                                  ? tempHospName 
+                                                  : value[0] !== "" 
+                                                    ? '無記名' 
+                                                    : "";
     const target = outputHospInfo.filter(x => x[hospNameIdx] === hospName);
-    const hospInfo = target.length === 1 ? target[0] : dummyHospInfo;
+    let hospInfo;
+    if (target.length === 1) {
+      hospInfo = [...target[0]];
+    } else {
+      hospInfo = [...dummyHospInfo];
+    }
+    if (hospName === "無記名") {
+      hospInfo[outputHospInfoHospNameIdx] = '無記名';
+    } else if (tempHospName === '弘前病院') {
+      hospInfo[outputHospInfoHospNameIdx] = '弘前総合医療センター';
+    } else {
+      hospInfo[outputHospInfoHospNameIdx] = value[hospNameIdx];
+    }
     const sortOrder = hospInfo[sortOrderIdx] !== '' 
                                               ? hospInfo[sortOrderIdx]
                                               : segmentSortOrder.get('無記名');
@@ -49,7 +66,9 @@ function summarizeEnquete_(inputSsId, outputSsId){
     spreadSheetCommon.insertSheetBySheetName(outputSs.getId(), sheetName);
     const outputSheet = outputSs.getSheetByName(sheetName);
     const outputValues = mergeValues.map(value => inputValueIdxList.map(idx => value[idx]));
-    outputSheet.clear();
+    if (outputSheet.getLastRow() > 0) {
+      outputSheet.getRange(1, 1, outputSheet.getLastRow(), outputValues[0].length).clearContent();
+    } 
     outputSheet.getRange(1, 1, outputValues.length, outputValues[0].length).setValues(outputValues);
     SpreadsheetApp.flush();
     colWidthsList.get(sheetName).forEach((colWidth, idx) => outputSheet.setColumnWidth(idx + 1, colWidth));
