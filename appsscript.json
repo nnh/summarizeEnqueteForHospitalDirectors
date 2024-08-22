@@ -1,6 +1,21 @@
 {
-  "timeZone": "America/New_York",
+  "timeZone": "Asia/Tokyo",
   "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "spreadSheetCommon",
+        "version": "0",
+        "libraryId": "1w-SeGRWoKnMG779iYsTVAn_SKa3Z19-eqDmDn84f8GzNHb6Cfdo_8wOQ",
+        "developmentMode": true
+      }
+    ],
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Sheets",
+        "version": "v4",
+        "serviceId": "sheets"
+      }
+    ]
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8"
